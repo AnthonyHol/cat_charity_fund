@@ -68,5 +68,6 @@ async def investing_process(
             break
 
     await session.commit()
+    await session.refresh(object_in)
 
     return object_in
