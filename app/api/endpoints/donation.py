@@ -51,6 +51,6 @@ async def create_donation(
     """[AUTH] Создать пожертвование."""
 
     donation = await donation_crud.create(donation, session, user)
-    await investing_process(donation, session)
+    await investing_process(donation, CharityProject, session)
 
     return donation

@@ -8,7 +8,7 @@ class CharityProjectBase(BaseModel):
     """Базовая схема для работы с проектами."""
 
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    description: Optional[str]
+    description: Optional[str] = Field(None, min_length=1)
     full_amount: Optional[int]
 
     class Config:

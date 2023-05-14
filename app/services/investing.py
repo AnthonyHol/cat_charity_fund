@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Union
+from typing import List, Type, Union
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,7 +24,9 @@ async def get_available_objects(
     return objects.scalars().all()
 
 
-async def close_donation_for_obj(obj_in: Union[CharityProject, Donation]):
+async def close_donation_for_obj(
+    obj_in: Union[CharityProject, Donation]
+) -> Union[CharityProject, Donation]:
     """Ф-я закрытия для объекта (проекта или пожертвования)."""
 
     obj_in.invested_amount = obj_in.full_amount
@@ -34,85 +36,35 @@ async def close_donation_for_obj(obj_in: Union[CharityProject, Donation]):
     return obj_in
 
 
-# async def invest_money(
-#     donation: Union[CharityProject, Donation],
-#     project: Union[CharityProject, Donation],
-# ) -> Union[CharityProject, Donation]:
-#     """Ф-я инвестирования пожертвований в проект."""
-
-#     # остаток пожертвования
-#     donation_free_amount = donation.full_amount - donation.invested_amount
-#     # остаток требумой суммы в проекте
-#     project_free_amount = project.full_amount - project.invested_amount
-
-#     if donation_free_amount > project_free_amount:
-#         donation.invested_amount += project_free_amount
-#         await close_donation_for_obj(project)
-
-#     elif donation_free_amount == project_free_amount:
-#         await close_donation_for_obj(donation)
-#         await close_donation_for_obj(project)
-
-#     else:
-#         project.invested_amount += donation_free_amount
-#         await close_donation_for_obj(donation)
-
-#     return donation, project
-
-
-# async def investing_process(
-#     obj_in: Union[CharityProject, Donation],
-#     model_add: Union[CharityProject, Donation],
-#     session: AsyncSession,
-# ) -> Union[CharityProject, Donation]:
-#     objects_model = await get_available_projects(obj_in, session)
-
-#     for model in objects_model:
-#         obj_in, model = await invest_money(model_add, model)
-#         session.add(obj_in)
-#         session.add(model)
-
-#     await session.commit()
-#     await session.refresh(obj_in)
-
-
-#     return obj_in
-async def close_invested_object(
-    obj_to_close: Union[CharityProject, Donation],
-) -> None:
-    obj_to_close.fully_invested = True
-    obj_to_close.close_date = datetime.now()
-
-
 async def investing_process(
-    object_in: Union[CharityProject, Donation], session: AsyncSession
-):
-    model = CharityProject if isinstance(object_in, Donation) else Donation
+    object_in: Union[CharityProject, Donation],
+    model_class: Type[Union[CharityProject, Donation]],
+    session: AsyncSession,
+) -> Union[CharityProject, Donation]:
+    """Ф-я, реализующая логику инвестирования в проекты."""
 
-    not_invested_objects = await get_available_objects(model, session)
+    available_objects = await get_available_objects(model_class, session)
     available_amount = object_in.full_amount
 
-    if not not_invested_objects:
+    if not available_objects:
         return object_in
 
-    for not_invested_obj in not_invested_objects:
+    for not_invested_obj in available_objects:
         need_to_invest = (
             not_invested_obj.full_amount - not_invested_obj.invested_amount
         )
-        to_invest = (
-            need_to_invest
-            if need_to_invest < available_amount
-            else available_amount
-        )
+
+        to_invest = min(need_to_invest, available_amount)
+
         not_invested_obj.invested_amount += to_invest
         object_in.invested_amount += to_invest
         available_amount -= to_invest
 
         if not_invested_obj.full_amount == not_invested_obj.invested_amount:
-            await close_invested_object(not_invested_obj)
+            await close_donation_for_obj(not_invested_obj)
 
         if not available_amount:
-            await close_invested_object(object_in)
+            await close_donation_for_obj(object_in)
             break
 
     await session.commit()

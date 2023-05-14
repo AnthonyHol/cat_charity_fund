@@ -41,7 +41,7 @@ async def check_charity_project_exists(
     return project
 
 
-def check_charity_project_invested_sum(
+async def check_charity_project_invested_sum(  ##
     project: CharityProject, new_amount: int
 ):
     """Ф-я проверки доступности целевой суммы в рамках уже существующих пожертвований."""
@@ -53,7 +53,9 @@ def check_charity_project_invested_sum(
         )
 
 
-def check_charity_project_already_invested(charity_project: CharityProject):
+async def check_charity_project_already_invested(  ##
+    charity_project: CharityProject,
+):
     """Ф-я проверки наличия пожертвований в проект."""
 
     if charity_project.invested_amount > 0:
@@ -63,7 +65,7 @@ def check_charity_project_already_invested(charity_project: CharityProject):
         )
 
 
-def check_charity_project_closed(charity_project: CharityProject):
+async def check_charity_project_closed(charity_project: CharityProject):  ##
     """Ф-я проверки того, закрыт ли проект."""
 
     if charity_project.fully_invested:

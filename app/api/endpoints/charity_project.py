@@ -43,7 +43,7 @@ async def create_charity_project(
 
     project = await charity_project_crud.create(charity_project, session)
 
-    await investing_process(project, session)
+    await investing_process(project, Donation, session)
 
     return project
 
@@ -80,9 +80,9 @@ async def update_charity_project(
     if obj_in.name:
         await check_name_duplicate(obj_in.name, session)
     if obj_in.full_amount is not None:
-        check_charity_project_invested_sum(project, obj_in.full_amount)
+        await check_charity_project_invested_sum(project, obj_in.full_amount)
 
-    check_charity_project_closed(project)
+    await check_charity_project_closed(project)
 
     charity_project = await charity_project_crud.update(
         project, obj_in, session
@@ -101,6 +101,6 @@ async def delete_charity_project(
 ):
     """[ADMIN] Удалить проект."""
     project = await check_charity_project_exists(project_id, session)
-    check_charity_project_already_invested(project)
+    await check_charity_project_already_invested(project)
 
     return await charity_project_crud.remove(project, session)
