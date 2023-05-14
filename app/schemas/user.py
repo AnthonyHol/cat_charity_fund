@@ -1,6 +1,3 @@
-import datetime
-from typing import Optional
-
 from fastapi_users import schemas
 
 

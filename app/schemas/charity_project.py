@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Extra, Field, validator
 
 
 class CharityProjectBase(BaseModel):
@@ -11,26 +11,23 @@ class CharityProjectBase(BaseModel):
     description: Optional[str]
     full_amount: Optional[int]
 
-    @validator('name')
-    def name_cant_be_none(cls, value: str):
-        if value is None:
-            raise ValueError(
-                'Имя/описание целевого проекта не может быть пустым!'
-            )
-        return value
+    class Config:
+        extra = Extra.forbid
 
 
 class CharityProjectCreate(CharityProjectBase):
     """Схема для создания проекта."""
 
     name: str = Field(..., min_length=1, max_length=100)
-    description: str
+    description: str = Field(..., min_length=1)
     full_amount: int = Field(..., gt=0)
 
-    @validator('name', 'description', 'full_amount')
+    @validator('name', 'description')
     def none_and_empty_not_allowed(cls, value: str):
         if not value or value is None:
-            raise ValueError('Требуется заполнить все поля!')
+            raise ValueError(
+                'Все поля обязательные! Нельзя использовать "" или None!'
+            )
         return value
 
 
@@ -40,7 +37,7 @@ class CharityProjectUpdate(CharityProjectBase):
     pass
 
 
-class CharityProjectDB(CharityProjectBase):
+class CharityProjectDB(CharityProjectCreate):
     """Схема для работы с проектом в БД."""
 
     id: int

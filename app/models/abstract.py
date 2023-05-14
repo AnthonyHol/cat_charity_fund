@@ -9,18 +9,17 @@ class AbstractModel(Base):
     """Абстрактная модель для моделей проектов и пожертвований."""
 
     __abstract__ = True
+    __table_args__ = (
+        CheckConstraint("full_amount > 0"),
+        CheckConstraint("invested_amount >= 0"),
+        CheckConstraint("invested_amount <= full_amount"),
+    )
 
     full_amount = Column(Integer, nullable=False)
     invested_amount = Column(Integer, default=0)
     fully_invested = Column(Boolean, default=False)
     create_date = Column(DateTime, default=datetime.now)
     close_date = Column(DateTime)
-
-    __table_args__ = (
-        CheckConstraint('full_amount > 0'),
-        CheckConstraint('invested_amount >= 0'),
-        CheckConstraint('invested_amount <= full_amount'),
-    )
 
     def __repr__(self) -> str:
         return super().__repr__()
