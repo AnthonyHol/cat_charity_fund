@@ -1,11 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer
+from sqlalchemy import Boolean, CheckConstraint, Column, DateTime, Integer
 
 from app.core.db import Base
 
 
 class AbstractModel(Base):
+    """Абстрактная модель для моделей проектов и пожертвований."""
+
     __abstract__ = True
 
     full_amount = Column(Integer, nullable=False)
@@ -13,3 +15,12 @@ class AbstractModel(Base):
     fully_invested = Column(Boolean, default=False)
     create_date = Column(DateTime, default=datetime.now)
     close_date = Column(DateTime)
+
+    __table_args__ = (
+        CheckConstraint('full_amount > 0'),
+        CheckConstraint('invested_amount >= 0'),
+        CheckConstraint('invested_amount <= full_amount'),
+    )
+
+    def __repr__(self) -> str:
+        return super().__repr__()
