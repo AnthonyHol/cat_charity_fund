@@ -5,5 +5,4 @@ from app.core.db import Base
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
-    first_name = Column(String, nullable=False)
-    birthdate = Column(DateTime)
+    pass

@@ -1,8 +1,8 @@
 """Add user model
 
-Revision ID: b7a612713ac5
+Revision ID: 0c175929b9e1
 Revises: 
-Create Date: 2023-05-14 09:41:24.284475
+Create Date: 2023-05-14 09:52:38.514481
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b7a612713ac5'
+revision = '0c175929b9e1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,8 +25,6 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('is_verified', sa.Boolean(), nullable=False),
-    sa.Column('first_name', sa.String(), nullable=False),
-    sa.Column('birthdate', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('user', schema=None) as batch_op:

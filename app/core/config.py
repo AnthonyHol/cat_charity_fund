@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     app_desc: str
 
     database_url: str
-
     secret: str = 'SECRET'
+
     first_superuser_email: Optional[EmailStr] = None
     first_superuser_password: Optional[str] = None
 
