@@ -1,4 +1,5 @@
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import sys
 import os
 
@@ -10,7 +11,7 @@ formatter = logging.Formatter(
 
 consoleHandler = logging.StreamHandler(sys.stdout)
 consoleHandler.setFormatter(formatter)
-time_handler_info = logging.handlers.TimedRotatingFileHandler(
+time_handler_info = TimedRotatingFileHandler(
     APP_ROOT + "/logs/logs_info.log", when="m", interval=10, backupCount=1)
 
 time_handler_info.doRollover()
